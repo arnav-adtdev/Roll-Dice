@@ -122,7 +122,7 @@ style.
 
 script.
   document.addEventListener("DOMContentLoaded", () => {
-    //- const form = document.querySelector("#userForm");
+    const form = document.querySelector("#userForm");
     const diceSection = document.querySelector(".dice-section");
     const dice1 = document.querySelector("#dice1");
     const dice2 = document.querySelector("#dice2");
@@ -132,36 +132,36 @@ script.
     let hasRolled = false; // Track if user has already rolled the dice
 
     // Handle form submission and send data to the backend
-    //- form.addEventListener("submit", async (event) => {
-    //-     event.preventDefault();
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    //-     const name = document.querySelector("#name").value.trim();
-    //-     const course = document.querySelector("#course").value.trim();
+        const name = document.querySelector("#name").value.trim();
+        const course = document.querySelector("#course").value.trim();
 
-    //-     if (!name || !course) {
-    //-         alert("Please fill in all fields.");
-    //-         return;
-    //-     }
+        if (!name || !course) {
+            alert("Please fill in all fields.");
+            return;
+        }
 
-    //-     try {
-    //-         const response = await fetch("/submit", {
-    //-             method: "POST",
-    //-             headers: { "Content-Type": "application/json" },
-    //-             body: JSON.stringify({ name, course }),
-    //-         });
+        try {
+            const response = await fetch("/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, course }),
+            });
 
-    //-         const data = await response.json();
-    //-         alert(data.message);
+            const data = await response.json();
+            alert(data.message);
 
-    //-         // Hide form and show dice section
-    //-         form.style.display = "none";
-    //-         diceSection.style.display = "block";
+            // Hide form and show dice section
+            form.style.display = "none";
+            diceSection.style.display = "block";
 
-    //-     } catch (error) {
-    //-         console.error("Error submitting data:", error);
-    //-         alert("An error occurred. Please try again.");
-    //-     }
-    //- });
+        } catch (error) {
+            console.error("Error submitting data:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
 
     // Generate a random dice roll (1-6)
     const getRandomDiceNumber = () => Math.floor(Math.random() * 6) + 1;
