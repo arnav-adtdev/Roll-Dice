@@ -121,85 +121,70 @@ style.
   }
 
 script.
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("#userForm");
-    const diceSection = document.querySelector(".dice-section");
-    const dice1 = document.querySelector("#dice1");
-    const dice2 = document.querySelector("#dice2");
-    const rollBtn = document.querySelector(".roll");
-    const totalNumberDisplay = document.querySelector(".totalnumber");
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("#userForm");
+        const diceSection = document.querySelector(".dice-section");
+        const dice1 = document.querySelector("#dice1");
+        const dice2 = document.querySelector("#dice2");
+        const rollBtn = document.querySelector(".roll");
 
-    let hasRolled = false; // Track if user has already rolled the dice
+        let hasRolled = false;
 
-    // Handle form submission and send data to the backend
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+        // Handle form submission (No Database, Just Client-Side)
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
 
-        const name = document.querySelector("#name").value.trim();
-        const course = document.querySelector("#course").value.trim();
+            const name = document.querySelector("#name").value.trim();
+            const course = document.querySelector("#course").value.trim();
 
-        if (!name || !course) {
-            alert("Please fill in all fields.");
-            return;
-        }
+            if (!name || !course) {
+                alert("Please fill in all fields.");
+                return;
+            }
 
-        try {
-            const response = await fetch("/submit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, course }),
-            });
-
-            const data = await response.json();
-            alert(data.message);
+            // Simulate Success (No Database)
+            alert(`Form Submitted Locally\nName: ${name}\nCourse: ${course}`);
 
             // Hide form and show dice section
             form.style.display = "none";
             diceSection.style.display = "block";
+        });
 
-        } catch (error) {
-            console.error("Error submitting data:", error);
-            alert("An error occurred. Please try again.");
-        }
+        // Dice Roll Logic (Same as before)
+        const getRandomDiceNumber = () => Math.floor(Math.random() * 6) + 1;
+
+        const rollDice = () => {
+            if (!hasRolled) {
+                const random1 = getRandomDiceNumber();
+                const random2 = getRandomDiceNumber();
+                const total = random1 + random2;
+
+                [dice1, dice2].forEach(dice => dice.style.animation = "rolling 4s");
+
+                setTimeout(() => {
+                    const rotationMap = {
+                        1: "rotateX(0deg) rotateY(0deg)",
+                        2: "rotateX(-90deg) rotateY(0deg)",
+                        3: "rotateX(0deg) rotateY(90deg)",
+                        4: "rotateX(0deg) rotateY(-90deg)",
+                        5: "rotateX(90deg) rotateY(0deg)",
+                        6: "rotateX(180deg) rotateY(0deg)",
+                    };
+
+                    dice1.style.transform = rotationMap[random1];
+                    dice2.style.transform = rotationMap[random2];
+
+                    [dice1, dice2].forEach(dice => dice.style.animation = "none");
+
+                    rollBtn.textContent = `Total: ${total}`;
+                }, 4050);
+
+                hasRolled = true;
+                rollBtn.disabled = true;
+            } else {
+                alert("You can only roll the dice once!");
+            }
+        };
+
+        rollBtn.addEventListener("click", rollDice);
     });
-
-    // Generate a random dice roll (1-6)
-    const getRandomDiceNumber = () => Math.floor(Math.random() * 6) + 1;
-
-    // Roll both dice simultaneously
-    const rollDice = () => {
-        if (!hasRolled) {
-            const random1 = getRandomDiceNumber();
-            const random2 = getRandomDiceNumber();
-            const total = random1 + random2;
-
-            [dice1, dice2].forEach(dice => dice.style.animation = "rolling 4s");
-
-            setTimeout(() => {
-                const rotationMap = {
-                    1: "rotateX(0deg) rotateY(0deg)",
-                    2: "rotateX(-90deg) rotateY(0deg)",
-                    3: "rotateX(0deg) rotateY(90deg)",
-                    4: "rotateX(0deg) rotateY(-90deg)",
-                    5: "rotateX(90deg) rotateY(0deg)",
-                    6: "rotateX(180deg) rotateY(0deg)",
-                };
-
-                dice1.style.transform = rotationMap[random1];
-                dice2.style.transform = rotationMap[random2];
-
-                [dice1, dice2].forEach(dice => dice.style.animation = "none");
-
-                // Update button text with total number
-                rollBtn.textContent = `Total: ${total}`;
-            }, 4050);
-
-            hasRolled = true;
-            rollBtn.disabled = true;
-        } else {
-            alert("You can only roll the dice once!");
-        }
-    };
-
-    rollBtn.addEventListener("click", rollDice);
-  });
