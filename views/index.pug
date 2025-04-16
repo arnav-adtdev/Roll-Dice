@@ -12,7 +12,12 @@ html(lang="en")
   body
     .container
       // Form Section
+      p(style="color: brown; font-weight: bold; font-size: 24px;") WELCOME TO IT EXHIBITION FEST
+      | 2K25
+
       form#userForm
+        p FILL FORM TO PLAY GAME
+        br
         label(for="name") Name:
         input(type="text" id="name" required)
         
@@ -23,6 +28,8 @@ html(lang="en")
 
       // Dice Section (Initially Hidden)
       .dice-section(style="display: none;")
+        p(style="text-align: center; ") ROLL THE DICE AND SEE HOW MUCH YOU GET
+
         .dice-container
           .dice#dice1
             .face.front
@@ -42,7 +49,7 @@ html(lang="en")
 
         button.roll Roll Dice
 
-      //- .totalnumber
+     
 style.
   /* General Form Styling */
   form#userForm {
