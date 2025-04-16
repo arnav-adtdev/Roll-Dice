@@ -1,0 +1,205 @@
+doctype html
+html(lang="en")
+  head
+    title Roll Dice
+
+    // Montserrat Font
+    link(href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet")
+
+    // CSS File
+    link(rel="stylesheet" href="/index.css")
+
+  body
+    .container
+      // Form Section
+      form#userForm
+        label(for="name") Name:
+        input(type="text" id="name" required)
+        
+        label(for="course") Course:
+        input(type="text" id="course" required)
+        
+        button(type="submit") Submit
+
+      // Dice Section (Initially Hidden)
+      .dice-section(style="display: none;")
+        .dice-container
+          .dice#dice1
+            .face.front
+            .face.back
+            .face.top
+            .face.bottom
+            .face.right
+            .face.left
+
+          .dice#dice2
+            .face.front
+            .face.back
+            .face.top
+            .face.bottom
+            .face.right
+            .face.left
+
+        button.roll Roll Dice
+
+      //- .totalnumber
+style.
+  /* General Form Styling */
+  form#userForm {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+  }
+
+  form#userForm label {
+      display: block;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+  }
+
+  form#userForm input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s ease-in-out;
+  }
+
+  form#userForm input:focus {
+      border-color: #007bff;
+  }
+
+  form#userForm button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+  }
+
+  form#userForm button:hover {
+      background-color: #0056b3;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 600px) {
+      .container {
+          max-width: 95%;
+      }
+
+      form#userForm {
+          padding: 15px;
+      }
+
+      form#userForm input {
+          font-size: 14px;
+      }
+
+      form#userForm button {
+          font-size: 16px;
+          padding: 10px;
+      }
+
+      .dice {
+          width: 60px;
+          height: 60px;
+      }
+  }
+
+script.
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("#userForm");
+    const diceSection = document.querySelector(".dice-section");
+    const dice1 = document.querySelector("#dice1");
+    const dice2 = document.querySelector("#dice2");
+    const rollBtn = document.querySelector(".roll");
+    const totalNumberDisplay = document.querySelector(".totalnumber");
+
+    let hasRolled = false; // Track if user has already rolled the dice
+
+    // Handle form submission and send data to the backend
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = document.querySelector("#name").value.trim();
+        const course = document.querySelector("#course").value.trim();
+
+        if (!name || !course) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        try {
+            const response = await fetch("/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, course }),
+            });
+
+            const data = await response.json();
+            alert(data.message);
+
+            // Hide form and show dice section
+            form.style.display = "none";
+            diceSection.style.display = "block";
+
+        } catch (error) {
+            console.error("Error submitting data:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
+
+    // Generate a random dice roll (1-6)
+    const getRandomDiceNumber = () => Math.floor(Math.random() * 6) + 1;
+
+    // Roll both dice simultaneously
+    const rollDice = () => {
+        if (!hasRolled) {
+            const random1 = getRandomDiceNumber();
+            const random2 = getRandomDiceNumber();
+            const total = random1 + random2;
+
+            [dice1, dice2].forEach(dice => dice.style.animation = "rolling 4s");
+
+            setTimeout(() => {
+                const rotationMap = {
+                    1: "rotateX(0deg) rotateY(0deg)",
+                    2: "rotateX(-90deg) rotateY(0deg)",
+                    3: "rotateX(0deg) rotateY(90deg)",
+                    4: "rotateX(0deg) rotateY(-90deg)",
+                    5: "rotateX(90deg) rotateY(0deg)",
+                    6: "rotateX(180deg) rotateY(0deg)",
+                };
+
+                dice1.style.transform = rotationMap[random1];
+                dice2.style.transform = rotationMap[random2];
+
+                [dice1, dice2].forEach(dice => dice.style.animation = "none");
+
+                // Update button text with total number
+                rollBtn.textContent = `Total: ${total}`;
+            }, 4050);
+
+            hasRolled = true;
+            rollBtn.disabled = true;
+        } else {
+            alert("You can only roll the dice once!");
+        }
+    };
+
+    rollBtn.addEventListener("click", rollDice);
+  });
